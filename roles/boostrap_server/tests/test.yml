@@ -1,0 +1,27 @@
+# A exécuter directement avec root et l'adresse ip du serveur
+# ansible-playbook roles/boostrap_server/tests/test.yml
+# -k -i 192.168.56.200, -e "tenant='kaitech'"
+
+---
+- name: Prequesites
+  hosts: all
+  remote_user: root
+  gather_facts: yes
+  
+  roles:
+    - roles/boostrap_server
+ 
+  vars:
+    adm_users:
+    # Non system user that has login capacity
+    - name: sysadmin
+      groups: sudo
+      password: Sl19063861sy*/
+      shell: /bin/bash
+      system: no
+    # system user that has no login capacity
+    - name: ansible
+      groups: sudo
+      password: ansible*/
+      shell: /usr/sbin/nologin
+      system: yes

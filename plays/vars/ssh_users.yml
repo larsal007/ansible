@@ -1,0 +1,61 @@
+---
+# List of ssh roles with passphrases
+users:
+  # KAITECH.BE
+  - name: ansible
+    tenant: kaitech
+    mail: [larsal007@gmail.com]
+    renewal: 360
+  - name: sysadmin
+    tenant: kaitech
+    mail: [larsal007@gmail.com]
+    renewal: 360
+  # FREEMIND
+  - name: ansible
+    tenant: freemind_group
+    mail: [salim.larhrib@freemind-group.com]
+    renewal: 360
+  - name: sysadmin
+    tenant: freemind_group
+    mail: [salim.larhrib@freemind-group.com]
+    renewal: 360
+  - name: nicola.barbiero
+    tenant: freemind_group
+    mail: [nicola.barbiero@freemind-group.com]
+    renewal: 90
+  - name: diogo.lourenco
+    tenant: freemind_group
+    mail: [diogo.lourenco@freemind-group.com]
+    renewal: 90
+  - name: domenico.reggiori
+    tenant: freemind_group
+    mail: [domenico.reggiori@freemind-group.com]
+    renewal: 90
+  - name: carlo.mele
+    tenant: freemind_group
+    mail: [carlo.mele@freemind-group.com]
+    renewal: 90
+  - name: fabio.laviano
+    tenant: freemind_group
+    mail: [fabio.laviano@freemind-group.com]
+    renewal: 90
+  - name: nicolas.vyt
+    tenant: freemind_group
+    mail: [nicolas.vyt@freemind-group.com]
+    renewal: 90
+  - name: sarvani.rallabandi
+    tenant: freemind_group
+    mail: [sarvani.rallabandi@freemind-group.com]
+    renewal: 90
+  - name: vincent.faidherbe
+    tenant: freemind_group
+    mail: [vincent.faidherbe@freemind-group.com]
+    renewal: 90
+  - name: cedric.bauffe
+    tenant: freemind_group
+    mail: [cedric.bauffe@freemind-group.com]
+    renewal: 90
+  - name: anthony.bras
+    tenant: freemind_group
+    mail: [anthony.bras@freemind-group.com]
+    renewal: 90

@@ -1,0 +1,22 @@
+galaxy_info:
+  author: Manage users
+  description: Add & delete users with their ssh public keys & passwords
+  company: Salim Larhrib
+
+  license: license (GPL-2.0-or-later, MIT, etc)
+
+  min_ansible_version: 2.10
+
+  platforms:
+    - name: EL
+      versions:
+        - all
+    - name: Debian
+      versions:
+        - 10
+        - 9
+        - 8
+
+  galaxy_tags: [system, user, ssh]
+
+dependencies: []

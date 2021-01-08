@@ -1,0 +1,42 @@
+Testing machine > vbox_ansible
+Virtualbox
+Debian 10
+NAT > SSH port 2200
+public shared network > 192.168.56.200 
+************************************************
+nano /etc/network/interfaces
+# The secondary network interface (that's the host-only network)
+auto enp0s8
+iface enp0s8 inet static
+  address 192.168.56.200
+  netmask 255.255.255.0
+************************************************
+# Phase 1 : Generate on client machine shh keys
+# playbook >> manage_ssh_keys
+# the users file is plays/ssh_users.yml
+# the output directories
+### /homesysadmin/ssh_keys
+### /homesysadmin/ssh_keys_save
+# This command must run everyday to ensure lifecycle
+ansible-playbook plays/gen_ssh_keys.yml
+
+# Phase 2 : Bootstrap servers
+# playbook >> bootstrap_server
+### Create admin users
+### Harden SSH
+# The remote user is root > Prepare passwords before start the command
+ansible-playbook plays/bootstrap_server.yml -k -i inventories/local.yml -l vbox_ansible
+ansible-playbook plays/bootstrap_server.yml -k -i inventories/kaitech.yml -l ansible
+ansible-playbook plays/bootstrap_server.yml -k -i inventories/freemind.yml -l dev   
+
+For testing > ssh sysadmin@192.168.56.200 -i /home/sysadmin/ssh_keys/freemind_sysadmin_id_rsa_pub
+
+# Phase 3: Create users
+# playbook >> manage_users
+# The remote user is ansible
+# If we want to avoid input passphrase for each command
+eval "$(ssh-agent -s)"
+ssh-add /home/sysadmin/ssh_keys/freemind_ansible_id_rsa
+enter passphrase for /.../../... : xxxxx
+ssh-add -l
+ansible-playbook plays/manage_users.yml -i inventories/freemind.yml

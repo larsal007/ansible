@@ -1,0 +1,45 @@
+all:
+  children:
+    freemind_group:
+      children:
+        freemind:
+          hosts:
+            freemind01:
+              ansible_host: 217.182.165.158 #ns3074474.ip-217-182-165.eu
+            freemind02:
+              ansible_host: 51.75.146.122
+        himeta:
+          hosts:
+            main01:
+              ansible_host: 37.59.33.184  #ns3110035.ip-54-38-80.eu
+            main02:
+              ansible_host: 54.38.80.62
+            storage01:
+              ansible_host: 54.36.105.89  #ns3096127.ip-54-36-105.eu
+            storage02:
+              ansible_host: 54.36.104.191 #ns3089099.ip-54-36-104.eu
+        debian:
+          hosts:
+            freemind01:
+            freemind02:
+            main01:
+            main02:
+            storage01:
+            storage02:
+        dev:
+          hosts:
+            freemind01:
+        prod:
+          hosts:
+            freemind02:
+            main01:
+            main02:
+            storage01:
+            storage02:
+        webservers:
+        mysqlservers:
+  vars:
+    ansible_connection: ssh
+    #ansible_user: ansible
+    ansible_ssh_private_key_file: /home/sysadmin/ssh_keys/freemind_ansible_id_rsa
+    tenant: freemind_group

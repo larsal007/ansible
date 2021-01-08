@@ -1,0 +1,16 @@
+---
+# tasks file for roles/manage_ssh_keys
+- name: Ensure ssh directory
+  file:
+    path: "{{ SSH_DIR }}"
+    state: directory
+
+- name: Ensure save directory
+  file:
+    path: "{{ SSH_DIR_SAVE }}"
+    state: directory
+
+# Launch tasks in a loop of users
+- name: Start Loop tasks on {{item.name}}
+  include_tasks: loop.yml    
+  loop: "{{ users }}"

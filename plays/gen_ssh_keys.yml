@@ -1,0 +1,31 @@
+---
+- name:  Manage SSH keys with age check
+  connection: local
+  hosts: 127.0.0.1
+  become: no
+  become_user: sysadmin
+  gather_facts: true
+
+  roles:
+    - roles/manage_ssh_keys
+      
+  vars_files:
+    # List of ssh_users
+    - vars/ssh_users.yml
+
+  vars:
+    # Flag to avoid mail sending during tests
+    - send_mail: true
+    - SSH_DIR: '/home/sysadmin/ssh_keys'
+  
+  pre_tasks:
+
+  tasks:
+
+#hipchat - Send a message to Hipchat
+#jabber - Send a message to jabber user or chat room
+#rabbitmq_publish - Publish a message to a RabbitMQ queue
+#rocketchat - Send notifications to Rocket Chat
+#say - Makes a computer to speak
+#slack - Send Slack notifications
+#telegram - module for sending notifications via telegram

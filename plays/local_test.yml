@@ -1,0 +1,8 @@
+---
+- name: test ansible installation
+  hosts: 127.0.0.1
+  connection: local
+
+  tasks:
+  - name: print message
+    debug: msg="Ansible est dans la place"

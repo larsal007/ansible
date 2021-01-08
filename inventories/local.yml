@@ -1,0 +1,9 @@
+all:
+  hosts:
+    wsl:
+      ansible_connection: local     # L_000_ASUS
+    vbox_ansible:
+      ansible_host: 192.168.56.200  # vboxansible.kaitech.local
+      ansible_connection: ssh
+      ansible_ssh_private_key_file: /home/sysadmin/ssh_keys/kaitech_ansible_id_rsa
+    

@@ -1,0 +1,17 @@
+---
+- name: Install deb packages
+  include_tasks: debian.yml
+  when: ansible_os_family == 'Debian'
+  
+- name: Install yum packages
+  include_tasks: redhat.yml
+  when: ansible_os_family == 'RedHat'
+
+- name: Create administrative users
+  include_tasks: adm_users.yml
+  loop: "{{adm_users}}"
+  loop_control:
+    loop_var: admuser_item
+
+- name: Harden SSH
+  include_tasks: harden_ssh.yml

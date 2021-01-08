@@ -1,0 +1,140 @@
+# when: item.gen_ssh_key | default(False) | bool
+# effacer les anciennes clés du serveur
+# sed -i.bak "/KEY_COMMENT/d" /home/..../.ssh/authorized_keys
+
+# Get file details
+- name: Get file details
+  stat:
+    path: "{{SSH_DIR}}/{{item.tenant}}_{{item.name}}.ppk"
+  register: file_details
+
+# Check how many days old is the file
+- name: Check file age
+  set_fact:
+    old_key: "{{(ansible_date_time.epoch|float - file_details.stat.mtime) > (item.renewal * 24 * 3600) }}"
+    cacheable: no
+  when: file_details.stat.exists
+
+# Tasks
+- name: Conditionnal key generation
+  block:
+    - name: Set timestamp
+      set_fact:
+        time_stamp: '{{ansible_date_time.year}}{{ansible_date_time.month}}{{ansible_date_time.day}}_{{ansible_date_time.hour}}{{ansible_date_time.minute}}{{ansible_date_time.second}}'
+        cacheable: no
+
+    - name: Enumerate key files
+      find:
+        paths: "{{SSH_DIR}}"
+        patterns: "{{item.tenant}}_{{item.name}}*"
+      register: keys_to_delete
+
+    - name: Delete liste of files
+      file:
+        path: "{{ item.path }}"
+        state: absent
+      loop: "{{ keys_to_delete.files }}"
+
+    - name: Generate new zip password
+      command: diceware -w en_eff -n 1
+      failed_when: 0
+      register: password
+
+    - name: Generate new passphrase
+      raw : diceware -w en_eff -n 3 -d ' ' | tr -d '\n'
+      failed_when: 0
+      register: passphrase
+
+    - name: Generate SSH key without passphrase
+      command: ssh-keygen -t rsa -b 4096 
+              -f {{SSH_DIR}}/{{item.tenant}}_{{item.name}}_id_rsa 
+              -C "{{item.name}}@{{item.tenant}}_{{time_stamp}}" -N ""
+
+    - name: Generate PPK key from private SSH key
+      command: puttygen {{SSH_DIR}}/{{item.tenant}}_{{item.name}}_id_rsa
+              -o {{SSH_DIR}}/{{item.tenant}}_{{item.name}}.ppk
+
+    - name: Add passphrase to SSH Key
+      command: ssh-keygen -p 
+              -f {{SSH_DIR}}/{{item.tenant}}_{{item.name}}_id_rsa 
+              -N "{{passphrase.stdout}}"
+
+    - name: Add passphrase to PPK key
+      command: echo '{{passphrase.stdout}}' > {{SSH_DIR}}/tmp_passphrase &&
+
+              puttygen 
+              {{SSH_DIR}}/{{item.tenant}}_{{item.name}}.ppk 
+              -p --new-passphrase {{SSH_DIR}}/tmp_passphrase &&
+
+              rm {{SSH_DIR}}/tmp_passphrase
+
+    - name: Compress produced keys in 1 encrypted zip file
+      command: zip 
+              --password {{ password.stdout | quote }} -j 
+              -r {{SSH_DIR}}/{{item.tenant}}_{{item.name}}.zip
+              {{SSH_DIR}}/{{item.tenant}}_{{item.name}}_id_rsa
+              {{SSH_DIR}}/{{item.tenant}}_{{item.name}}.ppk
+
+    - name: Print passphrase & password
+      debug:
+        msg: user > "{{item.name}}"
+              passphrase > {{passphrase.stdout | quote}} 
+              password > {{password.stdout | quote}}
+
+    - name: Make a save of zip file
+      copy:
+        src: "{{SSH_DIR}}/{{item.tenant}}_{{item.name}}.zip"
+        dest: "{{SSH_DIR_SAVE}}/{{time_stamp}}_{{item.tenant}}_{{item.name}}.zip"
+   
+
+    - name: Save password and passphrase even if the file does not exist
+      lineinfile:
+        path: "{{SSH_DIR_SAVE}}/{{item.tenant}}_{{item.name}}.pass"
+        line: "{{ time_stamp }}\n{{ password.stdout }}\n{{ passphrase.stdout }}\n"
+        insertbefore: BOF
+        create: yes
+
+    - name: Send conditionnal mails
+      block:
+        - name: Send a mail with zip file
+          community.general.mail:
+            host: smtp.gmail.com
+            port: 587
+            secure: starttls
+            username: salim.larhrib@freemind-group.com
+            password: Sl19063861fr*/
+            to: "{{item.mail}}"
+            subject: SSH & PPK Keys files
+            attach: 
+              - '{{SSH_DIR}}/{{item.tenant}}_{{item.name}}.zip'
+            body: "Dear freeminder,
+              \nA new pair of private keys have been generated for the role 
+              >>>  {{item.name}}
+              \nThe PPK (Putty/WinSCP/FileZilla) & SSH (terminal) keys 
+              are in the attached encrypted archive.
+              \nYou will receive the zip password and SSH key passphrase in a separate mail.
+              \nPlease enjoy.\nRegards."
+          delegate_to: localhost
+
+        - name: Send SSH credentials
+          community.general.mail:
+            host: smtp.gmail.com
+            port: 587
+            secure: starttls
+            username: salim.larhrib@freemind-group.com
+            password: Sl19063861fr*/
+            to: "{{item.mail}}"
+            subject: SSH & PPK Keys credentials
+            body: "Dear freeminder,
+              \nYou have received a separate mail with archive containing your new SSH & PPK keys.
+              \nThe password to unzip the archive is :
+              \n>>> {{password.stdout}}
+              \nand the local passphrase for using both private keys is:
+              \n>>> {{passphrase.stdout}}
+              \nYour keys are concerning this login >>> {{item.name}} and have been dispatched to the servers. 
+              \nThe PPK keys are the one used with Putty / WinSCP / FileZilla
+              \nPlease enjoy.
+              \nRegards."
+          delegate_to: localhost
+      when: send_mail
+  when: ((not file_details.stat.exists) or old_key)

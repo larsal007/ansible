@@ -1,0 +1,3 @@
+---
+# vars file for roles/manage_ssh_keys
+SSH_DIR_SAVE: '{{SSH_DIR}}_save'

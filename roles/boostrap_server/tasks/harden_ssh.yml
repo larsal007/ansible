@@ -1,0 +1,19 @@
+---
+- name: Disable password login
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: ^#?PasswordAuthentication
+    line: PasswordAuthentication no
+
+- name: Disable Root Login
+  lineinfile:
+    dest: "/etc/ssh/sshd_config"
+    regexp: "^#?PermitRootLogin"
+    line: "PermitRootLogin no"
+
+- name: Disable Empty passwords 
+  lineinfile:
+    dest: "/etc/ssh/sshd_config"
+    regexp: "^#?PermitEmptyPasswords"
+    line: "PermitEmptyPasswords no"
+  notify: restart_ssh

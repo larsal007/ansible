@@ -1,0 +1,49 @@
+---
+# Check if the groupe exist on the server
+# because some users can be created with non default group 
+- name: Create groups if not exist
+  group:
+    name: '{{ admuser_item.group | default(admuser_item.name) }}'
+    state: present
+
+# Create a normal user or system user 
+# Normal user has shell >> /bin/bash and home directory
+# when sys user has /usr/sbin/nologin and no home
+# the group are not append which means that missing groups are deleted  
+- name: Create '{{admuser_item.name}}' user
+  user:
+    name: "{{admuser_item.name}}"
+    group: "{{ admuser_item.group | default(admuser_item.name) }}"
+    groups: "{{ admuser_item.groups | default('') }}"
+    password: "{{ admuser_item.password | password_hash('sha512', 'Salt_007') }}"
+    append: no
+    system: "{{ admuser_item.system | bool }}"
+    state: present
+    shell: "{{ admuser_item.shell }}"
+
+# Add existing key to authorized_keys
+# This to allow SSH from client to server 
+- name: Add '{{admuser_item.name}}' authorized SSH key
+  authorized_key:
+    user: "{{admuser_item.name}}"
+    state: present
+    key: "{{ lookup('file', item) }}"
+    exclusive: True
+  with_fileglob:
+    - "{{SSH_DIR}}/{{tenant}}_{{admuser_item.name}}_id_rsa.pub"
+
+# Add the pub & priv keys to the user
+# This lets the user jump from server to server
+- name: Copy pub & priv keys
+  block:
+    - name: Copy public key
+      copy:
+        src: "{{SSH_DIR}}/{{tenant}}_{{admuser_item.name}}_id_rsa.pub"
+        dest: "/home/{{admuser_item.name}}/.ssh/id_rsa.pub"
+        mode: 0600
+    - name: Copy private key
+      copy:
+        src: "{{SSH_DIR}}/{{tenant}}_{{admuser_item.name}}_id_rsa"
+        dest: "/home/{{admuser_item.name}}/.ssh/id_rsa"
+        mode: 0600
+  when: not admuser_item.system

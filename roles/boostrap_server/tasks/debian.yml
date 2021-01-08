@@ -1,0 +1,48 @@
+---
+#- name: Update apt cache
+#  apt:
+#    update_cache: true
+#  async: 600
+#  poll: 5
+
+- name: Install common packages
+  apt:
+    name: "{{item}}"
+    state: present
+#    update_cache: true
+  async: 600
+  poll: 5
+  loop:
+    - curl
+    #- diceware
+    - dnsutils
+    - net-tools
+    - openssl
+    #- putty-tools
+    - python3-minimal
+    #- python3-pip
+    - rsync
+    - sudo
+    - tree
+    - unzip
+    - zip
+    - wget
+
+- name: Remove dangerous packages
+  apt: 
+    name: "{{item}}"
+    state: absent
+    autoclean: yes
+    autoremove: yes
+  async: 600
+  poll: 5
+  loop:
+    - atftpd
+    - nis
+    - rsh-redone-server
+    - rsh-server
+    - telnetd
+    - tftpd
+    - tftpd-hpa
+    - xinetd
+    - yp-tools

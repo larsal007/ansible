@@ -1,0 +1,13 @@
+---
+mandatory_groups:
+  - sudo
+  - mosaic
+users:
+  - name: sysadmin
+    mail: larsal007@gmail.com
+    groups: sudo
+    system: yes
+  - name: mosuser
+    group: mosaic
+    mail: s.larhirb@gmail.com
+    groups: sudo

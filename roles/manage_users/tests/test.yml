@@ -1,0 +1,19 @@
+---
+- name: Manage users
+  hosts: all
+  remote_user: ansible
+  become: yes
+  
+  roles:
+    - roles/manage_users
+  
+  vars:
+    - ansible_become_password: ansible*/
+    - send_mail: false
+
+  pre_tasks:
+
+  tasks:
+
+
+#https://geektechstuff.com/2019/11/03/using-ansible-to-create-and-manage-users-linux-raspberry-pi/

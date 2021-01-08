@@ -1,0 +1,26 @@
+# Execute avec root et l'adresse ip du serveur
+# ansible-playbook plays/ping.yml -u root -i 192.168.56.200, -k
+
+# Execute avec inventaire qui inclut user & clé cryptage 
+# ansible-playbook plays/ping.yml -i inventories/local.yml
+
+# Execute avec inventaire qui inclut user & clé cryptage sur groupe wsl
+# ansible-playbook plays/ping.yml -i inventories/local.yml --limit wsl
+
+# Execute avec inventaire qui inclut user & clé cryptage sur groupe ansible
+# ansible-playbook plays/ping.yml -i inventories/local.yml --limit ansible
+---
+- name: Ping servers
+  hosts: all
+  gather_facts: yes
+
+  pre_tasks:
+  - name: install python3
+    raw: test -e /usr/bin/python3 && echo "Python3 is installed." || (apt -y update && apt install -y python3-minimal)
+    register: python3_output
+  
+  tasks:
+  - name: print pretask return
+    debug: var=python3_output.stdout_lines 
+  - name: run ping
+    ping:

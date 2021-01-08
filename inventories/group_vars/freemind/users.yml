@@ -1,0 +1,40 @@
+---
+mandatory_groups:
+  - sudo
+  - fmcuser
+users:
+  - name: sysadmin
+    mail: salim.larhrib@freemind-group.com
+    groups: sudo
+  - name: nicola.barbiero
+    mail: nicola.barbiero@freemind-group.com
+    groups: sudo,fmcuser
+  - name: diogo.lourenco
+    mail: diogo.lourenco@freemind-group.com
+    groups: fmcuser
+  - name: domenico.reggiori
+    mail: domenico.reggiori@freemind-group.com
+    groups: fmcuser
+  - name: carlo.mele
+    mail: carlo.mele@freemind-group.com
+    groups: fmcuser
+  - name: fabio.laviano
+    mail: fabio.laviano@freemind-group.com
+    groups: fmcuser
+  - name: nicolas.vyt
+    mail: nicolas.vyt@freemind-group.com
+    groups: fmcuser
+  - name: sarvani.rallabandi
+    mail: sarvani.rallabandi@freemind-group.com
+    groups: fmcuser
+  - name: vincent.faidherbe
+    mail: vincent.faidherbe@freemind-group.com
+    groups: fmcuser
+  - name: cedric.bauffe
+    mail: cedric.bauffe@freemind-group.com
+    groups: fmcuser
+  - name: anthony.bras
+    mail: anthony.bras@freemind-group.com
+    groups: fmcuser
+
+users_to_delete: []

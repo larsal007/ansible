@@ -1,0 +1,114 @@
+---
+# Check if the groups exist on the server
+- name: Ensure default group "{{ user_item.group | default(user_item.name) }}" exist
+  group:
+    name: "{{ user_item.group | default(user_item.name) }}"
+    state: present
+
+- name: Ensure mandatory groups exist
+  group:
+    name: "{{ item }}"
+    state: present
+  loop: "{{mandatory_groups}}"
+
+# Add/Update user
+- name: Add user "{{user_item.name}}"
+  user:
+    name: "{{ user_item.name }}"
+    group: "{{user_item.group | default(user_item.name) }}"
+    shell: /bin/bash
+    state: present
+  register: add_result
+
+# Set groups for the current user and delete old list
+- name: Update user within groups
+  user:
+    name: "{{user_item.name}}"
+    groups: "{{ user_item.groups | default('') }}"
+    append: no
+
+# Copy SSH key to allow remote access from local clients
+- name: Export "{{user_item.name}}" SSH key
+  authorized_key:
+    user: "{{user_item.name}}"
+    state: present
+    key: "{{ lookup('file', item) }}"
+    exclusive: True
+  with_fileglob:
+    - "{{SSH_DIR}}/{{tenant}}_{{user_item.name}}_id_rsa.pub"
+  register: key_result
+  tags: ssh
+
+# If the key has changed then
+#>> copy local ssh keys to the server
+#>> generate, local save and change remote password
+#>> force new password at login
+#>> inform the user by mail
+- name: Manage Credentials
+  block:
+    # Copy SSH keys to let user remote access between servers  
+    - name: Copy public key
+      copy:
+        src: "{{SSH_DIR}}/{{tenant}}_{{user_item.name}}_id_rsa.pub"
+        dest: "/home/{{user_item.name}}/.ssh/id_rsa.pub"
+        mode: 0644
+        owner: "{{user_item.name}}"
+        group: "{{user_item.name|default(user_item.name)}}"
+      tags: ssh
+    - name: Copy private key
+      copy:
+        src: "{{SSH_DIR}}/{{tenant}}_{{user_item.name}}_id_rsa"
+        dest: "/home/{{user_item.name}}/.ssh/id_rsa"
+        mode: 0644
+        owner: "{{user_item.name}}"
+        group: "{{user_item.name|default(user_item.name)}}"
+      tags: ssh
+  
+    # Generate a random password and save it in a variable
+    - name: Generate random password
+      set_fact:
+        password: "{{ lookup('password',
+              '{{CREDENT_DIR}}/{{tenant}}_{{user_item.name}}_passwords.txt 
+              encrypt=sha512_crypt') }}"
+      #cacheable: no
+
+    - name: Extract password
+      set_fact:
+        uncrypt_pwd: "{{ lookup('file',
+              '{{CREDENT_DIR}}/{{tenant}}_{{user_item.name}}_passwords.txt')
+              | regex_search('^.{20}|$') }}"
+    - name: Print uncrypted password
+      debug:
+        msg: "{{uncrypt_pwd}}"
+    
+    # Set new password
+    - name: Affect password for "{{user_item.name}}"
+      user:
+        name: "{{ user_item.name }}"
+        password: "{{password}}"
+
+    # Force the user to change the password at login 
+    - name: Force new password at login
+      command: chage -d 0 {{user_item.name}}
+
+    # Send mail
+    - name: Send a mail with credentials
+      community.general.mail:
+        host: smtp.gmail.com
+        port: 587
+        secure: starttls
+        username: salim.larhrib@freemind-group.com
+        password: Sl19063861fr*/
+        to: "{{user_item.mail}}"
+        subject: Credentials
+        body: "Dear freeminder,
+          \nYou have received a mail with private keys then you can init SSH connection to the servers.
+          \nFollowing are the credentials for your account inside the server :
+          \n>>> Login >>> {{user_item.name}}
+          \n>>> Password >>> {{uncrypt_pwd}}
+          \nOn your first login, you will be asked to change the password. For that, 
+          you will need first to inform above password as <old password>.
+          \nPlease enjoy.
+          \nRegards."
+      when: send_mail
+  when: (key_result.changed == true) or (add_result.changed == true)

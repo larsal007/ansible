@@ -1,0 +1,24 @@
+all:
+  children:
+    kaitech:
+      children:
+        dns:
+          hosts:
+            master01:
+              ansible_host: 51.75.133.35  #nsm01-ovh-eu-fr
+            slave31:
+              ansible_host: 149.91.83.59  #ns31-pulse-eu-fr 
+            slave41:
+              ansible_host: 158.69.62.182 #ns41-ovh-na-ca
+        webservers:
+          hosts:
+            wp000:
+              ansible_host: 154.49.211.181  #wp000-pulse-eu-fr
+        controllers:
+          hosts:
+            ansible:
+              ansible_host: 88.198.192.21   #ansible01-hzr-eu-de-nbg
+  vars:
+    ansible_connection: ssh
+    ansible_ssh_private_key_file: /home/sysadmin/ssh_keys/kaitech_ansible_id_rsa
+    tenant: kaitech

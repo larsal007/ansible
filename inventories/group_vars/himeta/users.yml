@@ -1,0 +1,26 @@
+---
+# freemind_dev & freemind_prod # himeta >> 5 users
+mandatory_groups:
+  - sudo
+  - himeta
+users:
+  - name: sysadmin
+    mail: salim.larhrib@freemind-group.com
+    groups: sudo
+  - name: nicola.barbiero
+    mail: nicola.barbiero@freemind-group.com
+    groups: sudo,himeta
+  - name: diogo.lourenco
+    mail: nicola.barbiero@freemind-group.com
+    groups: himeta
+  - name: domenico.reggiori
+    mail: nicola.barbiero@freemind-group.com
+    groups: himeta
+  - name: carlo.mele
+    mail: nicola.barbiero@freemind-group.com
+    groups: himeta
+  - name: fabio.laviano
+    mail: nicola.barbiero@freemind-group.com
+    groups: himeta
+
+users_to_delete: []

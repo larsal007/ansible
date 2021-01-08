@@ -1,0 +1,27 @@
+# A exécuter directement avec root et l'adresse ip du serveur
+# ansible-playbook roles/boostrap_server/tests/test.yml
+# -k -i inventories/xxx.yml -l xxxx
+
+---
+- name: Prequesites
+  hosts: all
+  remote_user: root
+  gather_facts: yes
+  
+  roles:
+    - roles/boostrap_server
+
+  vars:
+    adm_users:
+   # Non system user that has login capacity
+    - name: sysadmin
+      groups: sudo
+      password: Sl19063861sy*/
+      shell: '/bin/bash'
+      system: false
+    # system user that has no login capacity
+    - name: ansible
+      groups: sudo
+      password: ansible*/
+      shell: '/bin/bash'
+      system: true

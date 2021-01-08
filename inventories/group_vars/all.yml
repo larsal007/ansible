@@ -1,0 +1,12 @@
+# Variables concernant tous les hotes 
+#SSH_ADMIN_USER: sysadmin
+#SSH_PORT: 22
+
+ansible_port: 22
+
+SSH_DIR: /home/sysadmin/ssh_keys
+CREDENT_DIR: /home/sysadmin/credentials
+
+ansible_python_interpreter: /usr/bin/python3
+
+ansible_ssh_common_args: '-o StrictHostKeyChecking=no'

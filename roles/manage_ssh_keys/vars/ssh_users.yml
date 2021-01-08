@@ -1,0 +1,17 @@
+---
+# List of ssh users with passphrases
+users:
+  - name: sysadmin
+    tenant: freemind_group
+    mail: [salim.larhrib@freemind-group.com, larsal007@gmail.com]
+    renewal: 10
+  - name: nicola.barbiero
+    tenant: freemind_group
+    mail: [salim.larhrib@freemind-group.com, larsal007@gmail.com]
+    renewal: 10
+  - name: diogo.lourenco
+    tenant: freemind_group
+    mail: [salim.larhrib@freemind-group.com, larsal007@gmail.com]
+    renewal: 0
+
+renewal: 10;

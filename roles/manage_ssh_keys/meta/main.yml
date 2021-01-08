@@ -1,0 +1,20 @@
+galaxy_info:
+  author: Manage SSH Keys
+  description: Generate SSH & PPK keys with lifecycle management 
+  company: Salim Larhrib
+
+  license: license (GPL-2.0-or-later, MIT, etc)
+
+  min_ansible_version: 2.10
+
+  platforms:
+    - name: EL
+      versions:
+        - all
+    - name: Debian
+      versions:
+        - all
+
+  galaxy_tags: [system, ssh]
+
+dependencies: []
